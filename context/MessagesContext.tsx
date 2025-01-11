@@ -1,13 +1,13 @@
 import { createContext } from "react";
 
-type Message = {
+type MessageType = {
   role: string;
   content: string;
 };
 
 type MessagesContextType = {
-  messages: Message[];
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  messages: MessageType[];
+  setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
 };
 
 export const MessagesContext = createContext<MessagesContextType | undefined>(
