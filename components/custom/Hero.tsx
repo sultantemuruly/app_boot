@@ -37,10 +37,10 @@ const Hero = () => {
 
   return (
     <div className="flex flex-col items-center mt-52 lg:mt-36 gap-2">
-      <h2 className="font-bold text-4xl">Build something...</h2>
-      <p className="text-gray-700 font-medium">
+      <div className="font-bold text-4xl">Build something...</div>
+      <div className="text-gray-700 font-medium">
         AI powered platform where you can build your own app
-      </p>
+      </div>
 
       <div className="p-5 border rounded-xl max-w-xl w-full mt-3 bg-slate-50">
         <div className="flex gap-2">
