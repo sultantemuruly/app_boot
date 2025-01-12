@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { MessagesContext } from "@/context/MessagesContext";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { useConvex } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 type MessageType = {
   role: string;
@@ -13,12 +15,9 @@ type MessageType = {
 
 type UserDetailType = {
   email: string;
-  email_verified: boolean;
-  family_name: string;
-  given_name: string;
   name: string;
   picture: string;
-  sub: string;
+  uid: string;
 };
 
 export default function RootLayoutClient({
@@ -30,6 +29,28 @@ export default function RootLayoutClient({
   const [userDetail, setUserDetail] = useState<UserDetailType | undefined>(
     undefined
   );
+  const convex = useConvex();
+
+  useEffect(() => {
+    IsAuthenticated();
+  }, []);
+
+  const IsAuthenticated = async () => {
+    if (typeof window !== undefined) {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const result = await convex.query(api.users.GetUser, {
+        email: user?.email,
+      });
+
+      setUserDetail({
+        email: result.email,
+        name: result.name,
+        picture: result.picture,
+        uid: result.uid,
+      });
+      console.log(result);
+    }
+  };
 
   return (
     <GoogleOAuthProvider

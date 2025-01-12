@@ -2,12 +2,9 @@ import { createContext } from "react";
 
 type UserDetailType = {
   email: string;
-  email_verified: boolean;
-  family_name: string;
-  given_name: string;
   name: string;
   picture: string;
-  sub: string;
+  uid: string;
 };
 
 type UserDetailContextType = {

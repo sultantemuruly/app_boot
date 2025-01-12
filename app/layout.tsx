@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import RootLayoutClient from "./RootLayoutClient";
 import Header from "@/components/custom/Header";
+import { ConvexClientProvider } from "./ConvexClientProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,7 +18,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <Header />
-        <RootLayoutClient>{children}</RootLayoutClient>
+        <ConvexClientProvider>
+          <RootLayoutClient>{children}</RootLayoutClient>
+        </ConvexClientProvider>
       </body>
     </html>
   );
