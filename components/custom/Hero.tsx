@@ -5,19 +5,25 @@ import { useContext, useState } from "react";
 import { MessagesContext } from "@/context/MessagesContext";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import SigninDialog from "./SigninDialog";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
   const [userInput, setUserInput] = useState<string>("");
   const { messages, setMessages } = useContext(MessagesContext);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const createWorkSpace = useMutation(api.workspace.CreateWorkSpace);
+  const router = useRouter();
 
-  const onGenerate = (input: string) => {
+  const onGenerate = async (input: string) => {
     if (!userDetail?.name) {
       setOpenDialog(true);
 
       return;
     }
+
     setMessages([
       ...messages,
       {
@@ -25,6 +31,19 @@ const Hero = () => {
         content: input,
       },
     ]);
+
+    const workspaceId = await createWorkSpace({
+      user: userDetail._id,
+      messages: [
+        {
+          role: "user",
+          content: input,
+        },
+      ],
+    });
+
+    console.log(workspaceId);
+    router.push("/workspace/" + workspaceId);
   };
 
   const suggestions = [

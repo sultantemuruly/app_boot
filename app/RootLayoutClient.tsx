@@ -18,6 +18,7 @@ type UserDetailType = {
   name: string;
   picture: string;
   uid: string;
+  _id: string;
 };
 
 export default function RootLayoutClient({
@@ -47,6 +48,7 @@ export default function RootLayoutClient({
         name: result.name,
         picture: result.picture,
         uid: result.uid,
+        _id: result._id,
       });
       console.log(result);
     }
