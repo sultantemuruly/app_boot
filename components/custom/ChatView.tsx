@@ -3,11 +3,15 @@
 import { MessagesContext } from "@/context/MessagesContext";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { api } from "@/convex/_generated/api";
-import { useConvex } from "convex/react";
+import { useConvex, useMutation } from "convex/react";
 import { useParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowRight, Link } from "lucide-react";
+import { ArrowRight, Link, Loader } from "lucide-react";
+import axios from "axios";
+import { CHAT_PROMPT } from "@/constants/Prompt";
+import React from "react";
+import ReactMarkdown from "react-markdown";
 
 const ChatView = () => {
   const { id } = useParams();
@@ -15,10 +19,21 @@ const ChatView = () => {
   const [userInput, setUserInput] = useState<string>("");
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const { messages, setMessages } = useContext(MessagesContext);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const UpdataMessages = useMutation(api.workspace.UpdateMessages);
 
   useEffect(() => {
     id && GetWorkSpaceData();
   }, [id]);
+
+  useEffect(() => {
+    if (messages?.length > 0) {
+      const role = messages[messages.length - 1].role;
+      if (role === "user") {
+        GetAIResponse();
+      }
+    }
+  }, [messages]);
 
   const GetWorkSpaceData = async () => {
     const result = await convex.query(api.workspace.GetWorkSpace, {
@@ -27,13 +42,45 @@ const ChatView = () => {
     setMessages(result?.messages);
     console.log(result);
   };
+
+  const GetAIResponse = async () => {
+    setIsLoading(true);
+
+    const PROMPT = JSON.stringify(messages) + CHAT_PROMPT;
+    const result = await axios.post("/api/ai-chat", {
+      prompt: PROMPT,
+    });
+
+    const aiResponse = {
+      role: "ai",
+      content: result.data.result,
+    };
+    setMessages((prev) => [...prev, aiResponse]);
+    await UpdataMessages({
+      workspaceId: id,
+      messages: [...messages, aiResponse],
+    });
+    setIsLoading(false);
+  };
+
+  const onGenerate = async (input: string) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content: input,
+      },
+    ]);
+    setUserInput("");
+  };
+
   return (
     <div className="relative h-[85vh] flex flex-col">
       <div className="flex-1 overflow-y-scroll">
         {messages?.map((msg, index) => (
           <div
             key={index}
-            className="bg-slate-100 p-3 rounded-lg mb-2 flex gap-2 items-center"
+            className="bg-slate-100 p-3 rounded-lg mb-2 flex gap-2 items-center leading-7"
           >
             {msg?.role === "user" && userDetail?.picture && (
               <Image
@@ -44,9 +91,17 @@ const ChatView = () => {
                 className="rounded-full"
               />
             )}
-            <div>{msg.content}</div>
+            <ReactMarkdown className="flex flex-col">
+              {msg.content}
+            </ReactMarkdown>
           </div>
         ))}
+        {isLoading && (
+          <div className="bg-slate-100 p-3 rounded-lg mb-2 flex gap-2 items-center">
+            <Loader className="animate-spins" />
+            <p className="text-gray-400 ">Generating response...</p>
+          </div>
+        )}
       </div>
 
       {/* Input Field */}
@@ -55,6 +110,7 @@ const ChatView = () => {
           <textarea
             placeholder="What do you want to build?"
             className="w-full h-48 outline-none border-none resize-none bg-transparent"
+            value={userInput}
             onChange={(event) => {
               setUserInput(event.target.value);
             }}
