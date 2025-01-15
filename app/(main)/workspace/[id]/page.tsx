@@ -4,13 +4,28 @@ import CodeView from "@/components/custom/CodeView";
 const Workspace = () => {
   return (
     <div className="p-10">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-        <ChatView />
-        <div className="col-span-2">
-          <CodeView />
+      {/* Flex container */}
+      <div className="flex flex-col md:flex-row gap-12 w-full">
+        {/* ChatView section */}
+        <div className="w-full md:w-1/4 border border-slate-300">
+          <ChatView />
+        </div>
+
+        {/* Placeholder for CodeView */}
+        <div className="w-full md:w-1/2 flex-grow">
+          <div
+            style={{
+              width: "100%",
+              height: "200px",
+              backgroundColor: "lightgray",
+            }}
+          >
+            <CodeView />
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default Workspace;
