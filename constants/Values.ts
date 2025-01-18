@@ -1,3 +1,5 @@
+import dedent from "dedent";
+
 export const DEPENDENCIES = {
   uuid4: "^2.0.3",
   "tailwind-merge": "^2.4.0",
@@ -11,7 +13,7 @@ export const DEPENDENCIES = {
 };
 
 export const DEFAULT_FILES = {
-  "/public/index.html": {
+  "/src/index.html": {
     code: `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -23,7 +25,7 @@ export const DEFAULT_FILES = {
   <body class="bg-gray-100 text-gray-800">
     <div id="root"></div>
     <!-- React app mounts here -->
-    <script type="module" src="/App.js"></script>
+    <script type="module" src="/src/App.js"></script>
   </body>
 </html>
 
@@ -35,13 +37,13 @@ export const DEFAULT_FILES = {
 @tailwind utilities;
     `,
   },
-  "styles.css": {
+  "/src/styles.css": {
     code: `@tailwind base;
 @tailwind components;
 @tailwind utilities;
 `,
   },
-  "/tailwind.config.js": {
+  "/src/tailwind.config.js": {
     code: `/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{html,js}"],
@@ -53,7 +55,7 @@ module.exports = {
 
     `,
   },
-  "/postcss.config.js": {
+  "/src/postcss.config.js": {
     code: `module.exports = {
   plugins: {
     tailwindcss: {},
@@ -65,15 +67,15 @@ module.exports = {
   "/src/App.css": {
     code: `/* Add any custom styles here */`,
   },
-  "/App.js": {
+  "/src/App.js": {
     code: `import React from 'react';
 import './src/input.css';
 
 const App = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-800">
-      <h1 className="text-4xl font-bold text-blue-600">Hello, Tailwind!</h1>
-      <p className="mt-4 text-lg">This is a Tailwind CSS demo.</p>
+      <h1 className="text-4xl font-bold text-blue-600">Hello, World!</h1>
+      <p className="mt-4 text-lg">This is demo.</p>
     </div>
   );
 };

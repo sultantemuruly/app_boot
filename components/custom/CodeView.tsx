@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   SandpackProvider,
   SandpackLayout,
@@ -10,14 +10,75 @@ import {
 } from "@codesandbox/sandpack-react";
 
 import { DEFAULT_FILES, DEPENDENCIES } from "@/constants/Values";
+import { CODE_GEN_PROMPT } from "@/constants/Prompt";
+
+import axios from "axios";
+import { MessagesContext } from "@/context/MessagesContext";
+import { useConvex, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useParams } from "next/navigation";
+import { Loader2Icon } from "lucide-react";
 
 type TabType = "code" | "preview";
 
 const CodeView = () => {
+  const { id } = useParams();
   const [activeTab, setActiveTab] = useState<TabType>("code");
+  const [files, setFiles] = useState<any>(DEFAULT_FILES);
+  const { messages, setMessages } = useContext(MessagesContext);
+  const UpdateFiles = useMutation(api.workspace.UpdateFiles);
+  const convex = useConvex();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    id && GetFiles();
+  }, [id]);
+
+  const GetFiles = async () => {
+    setIsLoading(true);
+
+    const result = await convex.query(api.workspace.GetWorkSpace, {
+      workspaceId: id,
+    });
+
+    const mergedFiles = { ...result?.fileData }; //...DEFAULT_FILES,
+    setFiles(mergedFiles);
+
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (messages?.length > 0) {
+      const role = messages[messages.length - 1].role;
+      if (role === "user") {
+        GenerateAiCode();
+      }
+    }
+  }, [messages]);
+
+  const GenerateAiCode = async () => {
+    setIsLoading(true);
+
+    const PROMPT = JSON.stringify(messages) + " " + CODE_GEN_PROMPT;
+    const result = await axios.post("/api/gen-ai-code", {
+      prompt: PROMPT,
+    });
+
+    console.log(result.data);
+    const aiResponse = result.data;
+
+    const mergedFiles = { ...aiResponse.files }; //...DEFAULT_FILES,
+    setFiles(mergedFiles);
+    await UpdateFiles({
+      workspaceId: id,
+      files: aiResponse.files,
+    });
+
+    setIsLoading(false);
+  };
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       {/* Tab Selector */}
       <div className="bg-slate-200 w-full p-2 border">
         <div className="flex items-center flex-wrap shrink-0 bg-white p-1 w-[145px] gap-3 justify-center rounded-full">
@@ -44,7 +105,7 @@ const CodeView = () => {
 
       {/* Sandpack Provider */}
       <SandpackProvider
-        files={DEFAULT_FILES}
+        files={files}
         template="react"
         customSetup={{
           dependencies: {
@@ -64,6 +125,13 @@ const CodeView = () => {
           )}
         </SandpackLayout>
       </SandpackProvider>
+
+      {isLoading && (
+        <div className="p-10 bg-blue-700 opacity-50 absolute top-0 rounded-lg w-full h-full flex items-center justify-center">
+          <Loader2Icon className="animate-spin h-10 w-10 text-white" />
+          <div className="text-white">Generating code...</div>
+        </div>
+      )}
     </div>
   );
 };
