@@ -12,6 +12,7 @@ import axios from "axios";
 import { CHAT_PROMPT } from "@/constants/Prompt";
 import React from "react";
 import ReactMarkdown from "react-markdown";
+import { useSidebar } from "../ui/sidebar";
 
 const ChatView = () => {
   const { id } = useParams();
@@ -21,6 +22,7 @@ const ChatView = () => {
   const { messages, setMessages } = useContext(MessagesContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const UpdataMessages = useMutation(api.workspace.UpdateMessages);
+  const { toggleSidebar } = useSidebar();
 
   useEffect(() => {
     id && GetWorkSpaceData();
@@ -76,7 +78,7 @@ const ChatView = () => {
 
   return (
     <div className="relative h-[85vh] flex flex-col">
-      <div className="flex-1 overflow-y-scroll">
+      <div className="flex-1 overflow-y-scroll scrollbar-hide px-5">
         {messages?.map((msg, index) => (
           <div
             key={index}
@@ -105,25 +107,37 @@ const ChatView = () => {
       </div>
 
       {/* Input Field */}
-      <div className="p-5 border rounded-xl max-w-xl w-full mt-3 bg-slate-50">
-        <div className="flex gap-2">
-          <textarea
-            placeholder="What do you want to build?"
-            className="w-full h-48 outline-none border-none resize-none bg-transparent"
-            value={userInput}
-            onChange={(event) => {
-              setUserInput(event.target.value);
-            }}
+      <div className="flex gap-2 items-end">
+        {userDetail && (
+          <Image
+            src={userDetail?.picture}
+            alt={"user"}
+            width={35}
+            height={35}
+            className="rounded-full"
+            onClick={toggleSidebar}
           />
-          {userInput ? (
-            <ArrowRight
-              onClick={() => onGenerate(userInput)}
-              className="bg-blue-600 text-white p-2 h-8 w-8 rounded-md cursor-pointer"
+        )}
+        <div className="p-5 border rounded-xl max-w-xl w-full mt-3 bg-slate-50">
+          <div className="flex gap-2">
+            <textarea
+              placeholder="What do you want to build?"
+              className="w-full h-48 outline-none border-none resize-none bg-transparent"
+              value={userInput}
+              onChange={(event) => {
+                setUserInput(event.target.value);
+              }}
             />
-          ) : null}
-        </div>
-        <div>
-          <Link className="h-5 w-5" />
+            {userInput ? (
+              <ArrowRight
+                onClick={() => onGenerate(userInput)}
+                className="bg-blue-600 text-white p-2 h-8 w-8 rounded-md cursor-pointer"
+              />
+            ) : null}
+          </div>
+          <div>
+            <Link className="h-5 w-5" />
+          </div>
         </div>
       </div>
     </div>

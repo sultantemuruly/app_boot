@@ -3,7 +3,7 @@ import CodeView from "@/components/custom/CodeView";
 
 const Workspace = () => {
   return (
-    <div className="p-10">
+    <div className="p-3 pr-5">
       {/* Flex container */}
       <div className="flex flex-col md:flex-row gap-12 w-full">
         {/* ChatView section */}

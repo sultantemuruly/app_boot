@@ -3,6 +3,8 @@ import "./globals.css";
 import RootLayoutClient from "./RootLayoutClient";
 import Header from "@/components/custom/Header";
 import { ConvexClientProvider } from "./ConvexClientProvider";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/custom/AppSidebar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,7 +22,10 @@ export default function RootLayout({
         <ConvexClientProvider>
           <RootLayoutClient>
             <Header />
-            {children}
+            <SidebarProvider defaultOpen={false }>
+              <AppSidebar />
+              {children}
+            </SidebarProvider>
           </RootLayoutClient>
         </ConvexClientProvider>
       </body>
