@@ -18,17 +18,24 @@ import { useConvex, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useParams } from "next/navigation";
 import { Loader2Icon } from "lucide-react";
+import { UserDetailContext } from "@/context/UserDetailContext";
+import { countToken } from "@/lib/countToken";
 
 type TabType = "code" | "preview";
 
 const CodeView = () => {
   const { id } = useParams();
+  const convex = useConvex();
+
   const [activeTab, setActiveTab] = useState<TabType>("code");
   const [files, setFiles] = useState<any>(DEFAULT_FILES);
-  const { messages, setMessages } = useContext(MessagesContext);
-  const UpdateFiles = useMutation(api.workspace.UpdateFiles);
-  const convex = useConvex();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { messages, setMessages } = useContext(MessagesContext);
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+
+  const UpdateFiles = useMutation(api.workspace.UpdateFiles);
+  const UpdateToken = useMutation(api.users.UpdateToken);
 
   useEffect(() => {
     id && GetFiles();
@@ -72,6 +79,14 @@ const CodeView = () => {
     await UpdateFiles({
       workspaceId: id,
       files: aiResponse.files,
+    });
+
+    const userToken = Number(userDetail?.token);
+    const token = userToken - Number(countToken(JSON.stringify(aiResponse)));
+
+    UpdateToken({
+      userId: userDetail._id,
+      token: token,
     });
 
     setIsLoading(false);

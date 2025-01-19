@@ -13,15 +13,21 @@ import { CHAT_PROMPT } from "@/constants/Prompt";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import { useSidebar } from "../ui/sidebar";
+import { countToken } from "@/lib/countToken";
 
 const ChatView = () => {
   const { id } = useParams();
   const convex = useConvex();
+
   const [userInput, setUserInput] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
   const { messages, setMessages } = useContext(MessagesContext);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const UpdataMessages = useMutation(api.workspace.UpdateMessages);
+  const UpdateToken = useMutation(api.users.UpdateToken);
+
   const { toggleSidebar } = useSidebar();
 
   useEffect(() => {
@@ -57,11 +63,22 @@ const ChatView = () => {
       role: "ai",
       content: result.data.result,
     };
+
     setMessages((prev) => [...prev, aiResponse]);
+
     await UpdataMessages({
       workspaceId: id,
       messages: [...messages, aiResponse],
     });
+
+    const userToken = Number(userDetail?.token);
+    const token = userToken - Number(countToken(JSON.stringify(aiResponse)));
+
+    UpdateToken({
+      userId: userDetail._id,
+      token: token,
+    });
+
     setIsLoading(false);
   };
 

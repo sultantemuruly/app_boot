@@ -6,6 +6,7 @@ type UserDetailType = {
   picture: string;
   uid: string;
   _id: string;
+  token: number;
 };
 
 type UserDetailContextType = {
