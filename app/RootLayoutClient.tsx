@@ -7,8 +7,6 @@ import { UserDetailContext } from "@/context/UserDetailContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/custom/AppSidebar";
 
 type MessageType = {
   role: string;

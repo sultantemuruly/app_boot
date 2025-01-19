@@ -18,14 +18,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className="min-h-screen flex flex-col">
         <ConvexClientProvider>
           <RootLayoutClient>
+            {/* Header remains at the top */}
             <Header />
-            <SidebarProvider defaultOpen={false }>
-              <AppSidebar />
-              {children}
-            </SidebarProvider>
+            {/* Sidebar and main content */}
+            <div className="flex flex-grow">
+              <SidebarProvider defaultOpen={false}>
+                <div className="flex flex-row w-full">
+                  <AppSidebar className="flex-shrink-0 w-64 bg-purple-500" />
+                  <main className="flex-grow flex flex-col items-center justify-start">
+                    {children}
+                  </main>
+                </div>
+              </SidebarProvider>
+            </div>
           </RootLayoutClient>
         </ConvexClientProvider>
       </body>
