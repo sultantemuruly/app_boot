@@ -5,6 +5,7 @@ import Header from "@/components/custom/Header";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/custom/AppSidebar";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -31,6 +32,7 @@ export default function RootLayout({
                   <main className="flex-grow flex flex-col items-center justify-start">
                     {children}
                   </main>
+                  <Toaster />
                 </div>
               </SidebarProvider>
             </div>

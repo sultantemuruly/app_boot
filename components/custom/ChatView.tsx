@@ -14,6 +14,7 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import { useSidebar } from "../ui/sidebar";
 import { countToken } from "@/lib/countToken";
+import { toast } from "sonner";
 
 const ChatView = () => {
   const { id } = useParams();
@@ -74,15 +75,25 @@ const ChatView = () => {
     const userToken = Number(userDetail?.token);
     const token = userToken - Number(countToken(JSON.stringify(aiResponse)));
 
-    UpdateToken({
+    await UpdateToken({
       userId: userDetail._id,
       token: token,
     });
+
+    setUserDetail((prev) => ({
+      ...prev,
+      token: token,
+    }));
 
     setIsLoading(false);
   };
 
   const onGenerate = async (input: string) => {
+    if (userDetail.token < 10) {
+      toast("You don't have enough token to generate");
+      return;
+    }
+
     setMessages((prev) => [
       ...prev,
       {

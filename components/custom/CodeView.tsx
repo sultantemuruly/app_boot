@@ -84,10 +84,15 @@ const CodeView = () => {
     const userToken = Number(userDetail?.token);
     const token = userToken - Number(countToken(JSON.stringify(aiResponse)));
 
-    UpdateToken({
+    await UpdateToken({
       userId: userDetail._id,
       token: token,
     });
+
+    setUserDetail((prev) => ({
+      ...prev,
+      token: token,
+    }));
 
     setIsLoading(false);
   };
