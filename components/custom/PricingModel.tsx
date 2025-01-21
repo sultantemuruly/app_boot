@@ -1,7 +1,27 @@
-import { PRICING_OPTIONS } from "@/constants/Pricing";
+import { PRICING_OPTIONS, PlanType } from "@/constants/Pricing";
 import { Button } from "../ui/button";
+import { PayPalButtons } from "@paypal/react-paypal-js";
+import { useContext, useEffect, useState } from "react";
+import { UserDetailContext } from "@/context/UserDetailContext";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
 
 const PricingModel = () => {
+  const { userDetail, setUserDetail } = useContext(UserDetailContext);
+
+  const UpdateToken = useMutation(api.users.UpdateToken);
+
+  const [selectedOption, setSelectedOption] = useState<PlanType | null>(null);
+
+  const onPaymentSuccess = async () => {
+    const token = userDetail.token + Number(selectedOption?.value);
+    console.log(token);
+    await UpdateToken({
+      userId: userDetail._id,
+      token: token,
+    });
+  };
+
   return (
     <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
       {PRICING_OPTIONS.map((pricing, index) => (
@@ -14,7 +34,26 @@ const PricingModel = () => {
             {pricing.price}$
           </div>
 
-          <Button>Upgrade to {pricing.name}</Button>
+          {/* <Button>Upgrade to {pricing.name}</Button> */}
+          <PayPalButtons
+            disabled={!userDetail}
+            style={{ layout: "horizontal" }}
+            onClick={() => setSelectedOption(pricing)}
+            onApprove={() => onPaymentSuccess()}
+            onCancel={() => console.log("Payment Canceled")}
+            createOrder={(data, actions) => {
+              return actions.order.create({
+                purchase_units: [
+                  {
+                    amount: {
+                      value: pricing.price,
+                      currency_code: "USD",
+                    },
+                  },
+                ],
+              });
+            }}
+          />
         </div>
       ))}
     </div>

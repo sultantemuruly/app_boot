@@ -7,6 +7,7 @@ import { UserDetailContext } from "@/context/UserDetailContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { useConvex } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 type MessageType = {
   role: string;
@@ -60,18 +61,20 @@ export default function RootLayoutClient({
     <GoogleOAuthProvider
       clientId={process?.env.NEXT_PUBLIC_GOOGLE_AUT_CLIENT_ID_KEY}
     >
-      <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
-        <MessagesContext.Provider value={{ messages, setMessages }}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="white"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </MessagesContext.Provider>
-      </UserDetailContext.Provider>
+      <PayPalScriptProvider options={{ clientId: process?.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID }}>
+        <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
+          <MessagesContext.Provider value={{ messages, setMessages }}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="white"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </MessagesContext.Provider>
+        </UserDetailContext.Provider>
+      </PayPalScriptProvider>
     </GoogleOAuthProvider>
   );
 }

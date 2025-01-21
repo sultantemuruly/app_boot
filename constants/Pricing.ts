@@ -30,3 +30,10 @@ export const PRICING_OPTIONS = [
     price: 49.99,
   },
 ];
+export type PlanType = {
+  name: string;
+  tokens: string;
+  value: number;
+  desc: string;
+  price: number;
+};
