@@ -5,7 +5,6 @@ import {
   SandpackProvider,
   SandpackLayout,
   SandpackCodeEditor,
-  SandpackPreview,
   SandpackFileExplorer,
 } from "@codesandbox/sandpack-react";
 
@@ -20,6 +19,8 @@ import { useParams } from "next/navigation";
 import { Loader2Icon } from "lucide-react";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { countToken } from "@/lib/countToken";
+import SandpackPreviewClient from "./SandpackPreviewClient";
+import { ActionContext } from "@/context/ActionContext";
 
 type TabType = "code" | "preview";
 
@@ -33,6 +34,7 @@ const CodeView = () => {
 
   const { messages, setMessages } = useContext(MessagesContext);
   const { userDetail, setUserDetail } = useContext(UserDetailContext);
+  const { action, setAction } = useContext(ActionContext);
 
   const UpdateFiles = useMutation(api.workspace.UpdateFiles);
   const UpdateToken = useMutation(api.users.UpdateToken);
@@ -40,6 +42,10 @@ const CodeView = () => {
   useEffect(() => {
     id && GetFiles();
   }, [id]);
+
+  useEffect(() => {
+    setActiveTab("preview");
+  }, [action]);
 
   const GetFiles = async () => {
     setIsLoading(true);
@@ -141,7 +147,7 @@ const CodeView = () => {
               <SandpackCodeEditor style={{ height: "80vh" }} />
             </>
           ) : (
-            <SandpackPreview style={{ height: "80vh" }} showNavigator={true} />
+            <SandpackPreviewClient />
           )}
         </SandpackLayout>
       </SandpackProvider>
